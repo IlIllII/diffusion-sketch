@@ -6,6 +6,10 @@ from paint_tools import PenTool, LineTool
 active_tool = PenTool()
 # tools = ["polyline", "eraser", "circle", "rectangle", "fill", "selection", "freehand"]
 
+tools = {
+    pygame.K_1: PenTool(),
+    pygame.K_2: LineTool(),
+}
 
 undo_stack = []
 
@@ -54,21 +58,19 @@ if __name__ == "__main__":
 
             pygame.display.flip()
 
-            # if event.type == pygame.MOUSEMOTION:
-            #     if dragging:
-            #         second_point = pygame.mouse.get_pos()
-            #         dragging_line = (first_point, second_point)
-            # if event.type == pygame.MOUSEBUTTONDOWN:
-            #     if active_tool is not None:
-            #         active_tool.draw(screen)
-            #     if dragging:
-            #         lines.append(dragging_line)
-            #         dragging = False
-            #     else:
-            #         dragging = True
-            #         first_point = pygame.mouse.get_pos()
+
+
+
 
             if event.type == pygame.KEYDOWN:
+                
+                if event.key in tools:
+                    active_tool.deactivate()
+                    active_tool = tools[event.key]
+                    active_tool.activate()
+                    print(f"Tool changed to {active_tool.__class__.__name__}")
+
+
                 if event.key == pygame.K_BACKSPACE:
                     if len(lines) > 0:
                         lines.pop()
@@ -92,14 +94,5 @@ if __name__ == "__main__":
                         screen.blit(undo_stack.pop(), (0, 0))
                         pygame.display.flip()
 
-        # screen.fill((255, 255, 255))
-
-        # for line in lines:
-        # pygame.draw.line(screen, (0, 0, 0), line[0], line[1], 3)
-
-        # if dragging_line:
-        # pygame.draw.line(screen, (0, 0, 0), dragging_line[0], dragging_line[1])
-
-        # pygame.display.flip()
 
     pygame.quit()
