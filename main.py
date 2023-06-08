@@ -64,7 +64,7 @@ if __name__ == "__main__":
 
             if event.type == pygame.KEYDOWN:
                 
-                if event.key in tools:
+                if event.key in tools and not actively_drawing:
                     active_tool.deactivate()
                     active_tool = tools[event.key]
                     active_tool.activate()
