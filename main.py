@@ -7,7 +7,7 @@ active_tool = PenTool()
 # tools = ["polyline", "eraser", "circle", "rectangle", "fill", "selection", "freehand"]
 
 
-
+undo_stack = []
 
 
 if __name__ == "__main__":
@@ -37,7 +37,7 @@ if __name__ == "__main__":
             if event.type == pygame.MOUSEBUTTONUP:
                 actively_drawing = False
                 screen.blit(temp_canvas, (0, 0))
-
+                undo_stack.append(screen_copy.copy())
 
             if actively_drawing:
                 screen.blit(screen_copy, (0, 0))
@@ -87,7 +87,10 @@ if __name__ == "__main__":
                 if event.key == pygame.K_t:
                     pygame.draw.circle(screen, (0, 0, 0), pygame.mouse.get_pos(), 10)
                 
-
+                if event.key == pygame.K_u:
+                    if len(undo_stack) > 0:
+                        screen.blit(undo_stack.pop(), (0, 0))
+                        pygame.display.flip()
 
         # screen.fill((255, 255, 255))
 
