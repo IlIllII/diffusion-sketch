@@ -37,7 +37,7 @@ unit1 = webuiapi.ControlNetUnit(input_image=img, module='canny', model='controln
 unit2 = webuiapi.ControlNetUnit(input_image=img, module='invert', model='controlnet11Models_scribble [4e6af23e]', weight=1)
 
 r2 = api.img2img(prompt="airplane",
-            images=[img], 
+            images=[img],
             width=512,
             height=512,
             controlnet_units=[unit2, unit1],

@@ -1,9 +1,9 @@
 import pygame
 from render import render_image, generate_image
-from paint_tools import PenTool, LineTool
+from paint_tools import PenTool, LineTool, RectTool
 
 
-active_tool = PenTool()
+active_tool = RectTool()
 # tools = ["polyline", "eraser", "circle", "rectangle", "fill", "selection", "freehand"]
 
 tools = {
