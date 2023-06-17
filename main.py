@@ -86,6 +86,7 @@ if __name__ == "__main__":
                 if event.key == pygame.K_c:
                     screen.fill((255, 255, 255))
                     lines = []
+                    undo_stack = []
                     pygame.display.flip()
 
                 if event.key == pygame.K_t:
