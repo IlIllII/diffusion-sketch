@@ -1,14 +1,16 @@
 import pygame
 from render import render_image, generate_image
-from paint_tools import PenTool, LineTool, RectTool
+from paint_tools import PenTool, LineTool, RectTool, CircleTool
 
 
-active_tool = RectTool()
+active_tool = CircleTool()
 # tools = ["polyline", "eraser", "circle", "rectangle", "fill", "selection", "freehand"]
 
 tools = {
     pygame.K_1: PenTool(),
     pygame.K_2: LineTool(),
+    pygame.K_3: RectTool(),
+    pygame.K_4: CircleTool(),
 }
 
 undo_stack = []

@@ -124,3 +124,41 @@ class RectTool(Tool):
             width = abs(self.point1[0] - mouse_pos[0])
             height = abs(self.point1[1] - mouse_pos[1])
             pygame.draw.rect(canvas, (0, 0, 0), pygame.Rect(left, top, width, height), self.brush_size)
+
+
+class CircleTool(Tool):
+    mouse_down = False
+    point1 = (0, 0)
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.mouse_down = False
+        self.point1 = (0, 0)
+
+    def activate(self) -> None:
+        self.mouse_down = False
+        self.point1 = (0, 0)
+
+    def deactivate(self) -> None:
+        pass
+
+    def handle_event(self, event: pygame.event.Event, canvas: pygame.Surface) -> None:
+        mouse_pos = pygame.mouse.get_pos()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            self.mouse_down = True
+            self.point1 = mouse_pos
+            radius = 0
+            pygame.draw.circle(canvas, (0, 0, 0), self.point1, radius, self.brush_size)
+
+        if event.type == pygame.MOUSEMOTION and self.mouse_down:
+            distance_x = mouse_pos[0] - self.point1[0]
+            distance_y = mouse_pos[1] - self.point1[1]
+            radius = int((distance_x ** 2 + distance_y ** 2) ** 0.5)
+            pygame.draw.circle(canvas, (0, 0, 0), self.point1, radius, self.brush_size)
+
+        if event.type == pygame.MOUSEBUTTONUP:
+            self.mouse_down = False
+            distance_x = mouse_pos[0] - self.point1[0]
+            distance_y = mouse_pos[1] - self.point1[1]
+            radius = int((distance_x ** 2 + distance_y ** 2) ** 0.5)
+            pygame.draw.circle(canvas, (0, 0, 0), self.point1, radius, self.brush_size)
