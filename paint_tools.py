@@ -162,7 +162,7 @@ class RectTool(Tool):
     def deactivate(self) -> None:
         pass
 
-    def handle_event(self, event: pygame.event.Event, canvas: pygame.Surface) -> None:
+    def handle_event(self, event: pygame.event.Event, canvas: Canvas) -> None:
         mouse_pos = pygame.mouse.get_pos()
         if event.type == pygame.MOUSEBUTTONDOWN:
             self.mouse_down = True
@@ -172,7 +172,7 @@ class RectTool(Tool):
             width = abs(self.point1[0] - mouse_pos[0])
             height = abs(self.point1[1] - mouse_pos[1])
             pygame.draw.rect(
-                canvas,
+                canvas.get_surface_for_drawing(),
                 (0, 0, 0),
                 pygame.Rect(left, top, width, height),
                 self.brush_size,
@@ -184,7 +184,7 @@ class RectTool(Tool):
             width = abs(self.point1[0] - mouse_pos[0])
             height = abs(self.point1[1] - mouse_pos[1])
             pygame.draw.rect(
-                canvas,
+                canvas.get_surface_for_drawing(),
                 (0, 0, 0),
                 pygame.Rect(left, top, width, height),
                 self.brush_size,
@@ -197,11 +197,12 @@ class RectTool(Tool):
             width = abs(self.point1[0] - mouse_pos[0])
             height = abs(self.point1[1] - mouse_pos[1])
             pygame.draw.rect(
-                canvas,
+                canvas.get_surface_for_drawing(),
                 (0, 0, 0),
                 pygame.Rect(left, top, width, height),
                 self.brush_size,
             )
+            canvas.save_surface_to_screen()
 
 
 class CircleTool(Tool):
