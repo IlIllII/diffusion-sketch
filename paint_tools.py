@@ -9,12 +9,12 @@ class Canvas:
         self.temp_canvas.fill((255, 255, 255))
         self.screen_copy = screen.copy()
         self.undo_stack = []
-    
+
     def get_surface_for_drawing(self):
         if not self.actively_drawing:
             self.screen_copy = self.screen.copy()
             self.actively_drawing = True
-        
+
         self.screen.blit(self.screen_copy, (0, 0))
         self.temp_canvas.fill((255, 255, 255))
         self.temp_canvas.blit(self.screen_copy, (0, 0))
@@ -24,19 +24,19 @@ class Canvas:
         self.actively_drawing = False
         self.screen.blit(self.temp_canvas, (0, 0))
         self.undo_stack.append(self.screen_copy.copy())
-    
+
     def blit(self):
         if self.actively_drawing:
             self.screen.blit(self.temp_canvas, (0, 0))
         else:
             self.screen.blit(self.screen, (0, 0))
-    
+
     def reset(self):
         self.screen.fill((255, 255, 255))
         self.temp_canvas.fill((255, 255, 255))
         self.screen_copy = self.screen.copy()
         self.undo_stack = []
-    
+
     def undo(self):
         if len(self.undo_stack) > 0:
             self.screen.blit(self.undo_stack.pop(), (0, 0))
@@ -78,22 +78,34 @@ class LineTool(Tool):
             self.mouse_down = True
             self.point1 = mouse_pos
             pygame.draw.line(
-                canvas.get_surface_for_drawing(), (0, 0, 0), self.point1, self.point1, self.brush_size
+                canvas.get_surface_for_drawing(),
+                (0, 0, 0),
+                self.point1,
+                self.point1,
+                self.brush_size,
             )
 
-
         if event.type == pygame.MOUSEMOTION and self.mouse_down:
-            pygame.draw.line(canvas.get_surface_for_drawing(), (0, 0, 0), self.point1, mouse_pos, self.brush_size)
-
+            pygame.draw.line(
+                canvas.get_surface_for_drawing(),
+                (0, 0, 0),
+                self.point1,
+                mouse_pos,
+                self.brush_size,
+            )
 
         if event.type == pygame.MOUSEBUTTONUP:
             self.mouse_down = False
-            pygame.draw.line(canvas.get_surface_for_drawing(), (0, 0, 0), self.point1, mouse_pos, self.brush_size)
+            pygame.draw.line(
+                canvas.get_surface_for_drawing(),
+                (0, 0, 0),
+                self.point1,
+                mouse_pos,
+                self.brush_size,
+            )
             canvas.save_surface_to_screen()
             # self.stop_drawing()
-        
 
-        
         # self.screen.blit(self.canvas, (0, 0))
 
 
@@ -113,10 +125,10 @@ class PenTool(Tool):
     def deactivate(self) -> None:
         pass
 
-    def handle_event(self, event: pygame.event.Event, canvas: pygame.Surface) -> None:
+    def handle_event(self, event: pygame.event.Event, canvas: Canvas) -> None:
         mouse_pos = pygame.mouse.get_pos()
         if event.type == pygame.MOUSEBUTTONDOWN:
-            self.internal_canvas = canvas.copy()
+            self.internal_canvas = canvas.get_surface_for_drawing().copy()
             self.draw(canvas, mouse_pos)
             self.mouse_down = True
 
@@ -127,10 +139,11 @@ class PenTool(Tool):
             self.draw(canvas, mouse_pos)
             self.internal_canvas = None
             self.mouse_down = False
+            canvas.save_surface_to_screen()
 
     def draw(self, canvas: pygame.event.Event, mouse_pos: tuple) -> None:
         pygame.draw.circle(self.internal_canvas, (0, 0, 0), mouse_pos, self.brush_size)
-        canvas.blit(self.internal_canvas, (0, 0))
+        canvas.get_surface_for_drawing().blit(self.internal_canvas, (0, 0))
 
 
 class RectTool(Tool):
@@ -305,7 +318,12 @@ class EllipseTool(Tool):
             pygame.draw.ellipse(
                 canvas,
                 (0, 0, 0),
-                pygame.Rect(self.point1[0] - 0.5 * distance_x, self.point1[1] - 0.5 * distance_y, distance_x, distance_y),
+                pygame.Rect(
+                    self.point1[0] - 0.5 * distance_x,
+                    self.point1[1] - 0.5 * distance_y,
+                    distance_x,
+                    distance_y,
+                ),
                 self.brush_size,
             )
 
@@ -319,7 +337,12 @@ class EllipseTool(Tool):
             pygame.draw.ellipse(
                 canvas,
                 (0, 0, 0),
-                pygame.Rect(self.point1[0] - 0.5 * distance_x, self.point1[1] - 0.5 * distance_y, distance_x, distance_y),
+                pygame.Rect(
+                    self.point1[0] - 0.5 * distance_x,
+                    self.point1[1] - 0.5 * distance_y,
+                    distance_x,
+                    distance_y,
+                ),
                 self.brush_size,
             )
 
@@ -344,7 +367,7 @@ class SplineTool(Tool):
         mouse_pos = pygame.mouse.get_pos()
         if event.type == pygame.MOUSEBUTTONDOWN:
             self.points.append(mouse_pos)
-        
+
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
             pygame.draw.lines(canvas, (0, 0, 0), False, self.points, self.brush_size)
             self.points = []
