@@ -1,10 +1,50 @@
 import pygame
 
 
+class Canvas:
+    def __init__(self, screen):
+        self.actively_drawing = False
+        self.screen = screen
+        self.temp_canvas = pygame.Surface((512, 512))
+        self.temp_canvas.fill((255, 255, 255))
+        self.screen_copy = screen.copy()
+        self.undo_stack = []
+    
+    def get_surface_for_drawing(self):
+        if not self.actively_drawing:
+            self.screen_copy = self.screen.copy()
+            self.actively_drawing = True
+        
+        self.screen.blit(self.screen_copy, (0, 0))
+        self.temp_canvas.fill((255, 255, 255))
+        self.temp_canvas.blit(self.screen_copy, (0, 0))
+        return self.temp_canvas
+
+    def save_surface_to_screen(self):
+        self.actively_drawing = False
+        self.screen.blit(self.temp_canvas, (0, 0))
+        self.undo_stack.append(self.screen_copy.copy())
+    
+    def blit(self):
+        if self.actively_drawing:
+            self.screen.blit(self.temp_canvas, (0, 0))
+        else:
+            self.screen.blit(self.screen, (0, 0))
+    
+    def reset(self):
+        self.screen.fill((255, 255, 255))
+        self.temp_canvas.fill((255, 255, 255))
+        self.screen_copy = self.screen.copy()
+        self.undo_stack = []
+    
+    def undo(self):
+        if len(self.undo_stack) > 0:
+            self.screen.blit(self.undo_stack.pop(), (0, 0))
+
+
 class Tool:
     def __init__(self) -> None:
         self.brush_size = 3
-        pass
 
     def activate(self) -> None:
         pass
@@ -12,7 +52,7 @@ class Tool:
     def deactivate(self) -> None:
         pass
 
-    def handle_event(self, event: pygame.event.Event, canvas: pygame.Surface) -> None:
+    def handle_event(self, event: pygame.event.Event, canvas: Canvas) -> None:
         pass
 
 
@@ -32,21 +72,29 @@ class LineTool(Tool):
     def deactivate(self) -> None:
         pass
 
-    def handle_event(self, event: pygame.event.Event, canvas: pygame.Surface) -> None:
+    def handle_event(self, event: pygame.event.Event, canvas: Canvas) -> None:
         mouse_pos = pygame.mouse.get_pos()
         if event.type == pygame.MOUSEBUTTONDOWN:
             self.mouse_down = True
             self.point1 = mouse_pos
             pygame.draw.line(
-                canvas, (0, 0, 0), self.point1, self.point1, self.brush_size
+                canvas.get_surface_for_drawing(), (0, 0, 0), self.point1, self.point1, self.brush_size
             )
 
+
         if event.type == pygame.MOUSEMOTION and self.mouse_down:
-            pygame.draw.line(canvas, (0, 0, 0), self.point1, mouse_pos, self.brush_size)
+            pygame.draw.line(canvas.get_surface_for_drawing(), (0, 0, 0), self.point1, mouse_pos, self.brush_size)
+
 
         if event.type == pygame.MOUSEBUTTONUP:
             self.mouse_down = False
-            pygame.draw.line(canvas, (0, 0, 0), self.point1, mouse_pos, self.brush_size)
+            pygame.draw.line(canvas.get_surface_for_drawing(), (0, 0, 0), self.point1, mouse_pos, self.brush_size)
+            canvas.save_surface_to_screen()
+            # self.stop_drawing()
+        
+
+        
+        # self.screen.blit(self.canvas, (0, 0))
 
 
 class PenTool(Tool):
@@ -274,3 +322,29 @@ class EllipseTool(Tool):
                 pygame.Rect(self.point1[0] - 0.5 * distance_x, self.point1[1] - 0.5 * distance_y, distance_x, distance_y),
                 self.brush_size,
             )
+
+
+class SplineTool(Tool):
+    mouse_down = False
+    points = []
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.mouse_down = False
+        self.point1 = (0, 0)
+
+    def activate(self) -> None:
+        self.mouse_down = False
+        self.points = []
+
+    def deactivate(self) -> None:
+        pass
+
+    def handle_event(self, event: pygame.event.Event, canvas: pygame.Surface) -> None:
+        mouse_pos = pygame.mouse.get_pos()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            self.points.append(mouse_pos)
+        
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+            pygame.draw.lines(canvas, (0, 0, 0), False, self.points, self.brush_size)
+            self.points = []
