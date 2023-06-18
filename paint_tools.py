@@ -141,7 +141,7 @@ class PenTool(Tool):
             self.mouse_down = False
             canvas.save_surface_to_screen()
 
-    def draw(self, canvas: pygame.event.Event, mouse_pos: tuple) -> None:
+    def draw(self, canvas: Canvas, mouse_pos: tuple) -> None:
         pygame.draw.circle(self.internal_canvas, (0, 0, 0), mouse_pos, self.brush_size)
         canvas.get_surface_for_drawing().blit(self.internal_canvas, (0, 0))
 
@@ -221,7 +221,7 @@ class CircleTool(Tool):
     def deactivate(self) -> None:
         pass
 
-    def handle_event(self, event: pygame.event.Event, canvas: pygame.Surface) -> None:
+    def handle_event(self, event: pygame.event.Event, canvas: Canvas) -> None:
         mouse_pos = pygame.mouse.get_pos()
         if event.type == pygame.MOUSEBUTTONDOWN:
             self.mouse_down = True
@@ -278,7 +278,7 @@ class EraserTool(Tool):
     def deactivate(self) -> None:
         pass
 
-    def handle_event(self, event: pygame.event.Event, canvas: pygame.Surface) -> None:
+    def handle_event(self, event: pygame.event.Event, canvas: Canvas) -> None:
         mouse_pos = pygame.mouse.get_pos()
         if event.type == pygame.MOUSEBUTTONDOWN:
             self.internal_canvas = canvas.get_surface_for_drawing().copy()
@@ -294,11 +294,11 @@ class EraserTool(Tool):
             self.mouse_down = False
             canvas.save_surface_to_screen()
 
-    def draw(self, canvas: pygame.event.Event, mouse_pos: tuple) -> None:
+    def draw(self, canvas: Canvas, mouse_pos: tuple) -> None:
         pygame.draw.circle(
             self.internal_canvas, (255, 255, 255), mouse_pos, self.brush_size
         )
-        canvas.blit(self.internal_canvas, (0, 0))
+        canvas.get_surface_for_drawing().blit(self.internal_canvas, (0, 0))
 
 
 class EllipseTool(Tool):
@@ -317,7 +317,7 @@ class EllipseTool(Tool):
     def deactivate(self) -> None:
         pass
 
-    def handle_event(self, event: pygame.event.Event, canvas: pygame.Surface) -> None:
+    def handle_event(self, event: pygame.event.Event, canvas: Canvas) -> None:
         mouse_pos = pygame.mouse.get_pos()
         if event.type == pygame.MOUSEBUTTONDOWN:
             self.mouse_down = True
@@ -369,14 +369,16 @@ class EllipseTool(Tool):
             canvas.save_surface_to_screen()
 
 
-class SplineTool(Tool):
+class PolylineTool(Tool):
     mouse_down = False
     points = []
 
     def __init__(self) -> None:
         super().__init__()
         self.mouse_down = False
-        self.point1 = (0, 0)
+        self.points = []
+        self.actively_drawing = False
+        self.temp_canvas = None
 
     def activate(self) -> None:
         self.mouse_down = False
@@ -385,11 +387,107 @@ class SplineTool(Tool):
     def deactivate(self) -> None:
         pass
 
-    def handle_event(self, event: pygame.event.Event, canvas: pygame.Surface) -> None:
+    def handle_event(self, event: pygame.event.Event, canvas: Canvas) -> None:
         mouse_pos = pygame.mouse.get_pos()
+
         if event.type == pygame.MOUSEBUTTONDOWN:
+            if not self.actively_drawing:
+                self.internal_canvas = canvas.get_surface_for_drawing().copy()
+            self.actively_drawing = True
             self.points.append(mouse_pos)
+            self.draw(canvas, mouse_pos)
+
+        if event.type == pygame.MOUSEMOTION and self.actively_drawing:
+            self.draw(canvas, mouse_pos)
 
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-            pygame.draw.lines(canvas, (0, 0, 0), False, self.points, self.brush_size)
+            pygame.draw.lines(canvas.get_surface_for_drawing(), (0, 0, 0), False, self.points, self.brush_size)
             self.points = []
+            self.actively_drawing = False
+            canvas.save_surface_to_screen()
+    
+    def draw(self, canvas: Canvas, mouse_pos: tuple) -> None:
+        if len(self.points) > 1:
+            pygame.draw.lines(self.internal_canvas, (0, 0, 0), False, self.points, self.brush_size)
+        if not self.temp_canvas:
+            self.temp_canvas = self.internal_canvas.copy()
+        self.temp_canvas.blit(self.internal_canvas, (0, 0))
+        if len(self.points) > 0:
+            pygame.draw.line(self.temp_canvas, (0, 0, 0), self.points[-1], mouse_pos, self.brush_size)
+
+        canvas.get_surface_for_drawing().blit(self.temp_canvas, (0, 0))
+
+
+
+class SplineTool(Tool):
+    mouse_down = False
+    points = []
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.mouse_down = False
+        self.points = []
+        self.actively_drawing = False
+        self.temp_canvas = None
+
+    def activate(self) -> None:
+        self.mouse_down = False
+        self.points = []
+
+    def deactivate(self) -> None:
+        pass
+
+    def handle_event(self, event: pygame.event.Event, canvas: Canvas) -> None:
+        mouse_pos = pygame.mouse.get_pos()
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if not self.actively_drawing:
+                self.internal_canvas = canvas.get_surface_for_drawing().copy()
+            self.actively_drawing = True
+            self.points.append(mouse_pos)
+            self.draw(canvas, mouse_pos)
+
+        if event.type == pygame.MOUSEMOTION and self.actively_drawing:
+            self.draw(canvas, mouse_pos)
+
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+            canvas.get_surface_for_drawing() # Hack to reset the temp canvas
+            if len(self.points) >= 4:
+                vertices = self.get_bspline_vertices()
+                pygame.draw.lines(canvas.get_surface_for_drawing(), (0, 0, 0), False, vertices, self.brush_size)
+            self.points = []
+            self.actively_drawing = False
+            canvas.save_surface_to_screen()
+    
+    def draw(self, canvas: Canvas, mouse_pos: tuple) -> None:
+        if len(self.points) > 1:
+            pygame.draw.lines(self.internal_canvas, (0, 0, 0), False, self.points, self.brush_size)
+        if not self.temp_canvas:
+            self.temp_canvas = self.internal_canvas.copy()
+        self.temp_canvas.blit(self.internal_canvas, (0, 0))
+        if len(self.points) > 0:
+            pygame.draw.line(self.temp_canvas, (0, 0, 0), self.points[-1], mouse_pos, self.brush_size)
+
+        canvas.get_surface_for_drawing().blit(self.temp_canvas, (0, 0))
+    
+    def get_bspline_vertices(self):
+        segments = 100
+        if len(self.points) < 4:
+            raise Exception("Splines must have at least four control points.")
+        self.points = [self.points[0]] + self.points + [self.points[-1]]
+        vertices = []
+        for i in range(len(self.points) - 3):
+            control_points = self.points[i : i + 4]
+            for t in range(segments):
+                t = t / segments
+                B0 = (1 / 6) * (1 - t) ** 3
+                B1 = (1 / 6) * (3 * t ** 3 - 6 * t ** 2 + 4)
+                B2 = (1 / 6) * (-3 * t ** 3 + 3 * t ** 2 + 3 * t + 1)
+                B3 = (1 / 6) * (t ** 3)
+                bernstein_basis = [B0, B1, B2, B3]
+                vertex = vertex = [dot4D(bernstein_basis, control_point) for control_point in zip(*control_points)]
+                vertices.append(vertex)
+        return vertices
+
+def dot4D(v, w):
+    return sum(v_i*w_i for v_i, w_i in zip(v, w))
