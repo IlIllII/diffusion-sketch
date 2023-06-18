@@ -12,7 +12,7 @@ from paint_tools import (
 )
 
 
-active_tool = RectTool()
+active_tool = CircleTool()
 
 tools = {
     pygame.K_1: PenTool(),

@@ -227,20 +227,39 @@ class CircleTool(Tool):
             self.mouse_down = True
             self.point1 = mouse_pos
             radius = 0
-            pygame.draw.circle(canvas, (0, 0, 0), self.point1, radius, self.brush_size)
+            pygame.draw.circle(
+                canvas.get_surface_for_drawing(),
+                (0, 0, 0),
+                self.point1,
+                radius,
+                self.brush_size,
+            )
 
         if event.type == pygame.MOUSEMOTION and self.mouse_down:
             distance_x = mouse_pos[0] - self.point1[0]
             distance_y = mouse_pos[1] - self.point1[1]
             radius = int((distance_x**2 + distance_y**2) ** 0.5)
-            pygame.draw.circle(canvas, (0, 0, 0), self.point1, radius, self.brush_size)
+            pygame.draw.circle(
+                canvas.get_surface_for_drawing(),
+                (0, 0, 0),
+                self.point1,
+                radius,
+                self.brush_size,
+            )
 
         if event.type == pygame.MOUSEBUTTONUP:
             self.mouse_down = False
             distance_x = mouse_pos[0] - self.point1[0]
             distance_y = mouse_pos[1] - self.point1[1]
             radius = int((distance_x**2 + distance_y**2) ** 0.5)
-            pygame.draw.circle(canvas, (0, 0, 0), self.point1, radius, self.brush_size)
+            pygame.draw.circle(
+                canvas.get_surface_for_drawing(),
+                (0, 0, 0),
+                self.point1,
+                radius,
+                self.brush_size,
+            )
+            canvas.save_surface_to_screen()
 
 
 class EraserTool(Tool):
@@ -262,7 +281,7 @@ class EraserTool(Tool):
     def handle_event(self, event: pygame.event.Event, canvas: pygame.Surface) -> None:
         mouse_pos = pygame.mouse.get_pos()
         if event.type == pygame.MOUSEBUTTONDOWN:
-            self.internal_canvas = canvas.copy()
+            self.internal_canvas = canvas.get_surface_for_drawing().copy()
             self.draw(canvas, mouse_pos)
             self.mouse_down = True
 
@@ -273,6 +292,7 @@ class EraserTool(Tool):
             self.draw(canvas, mouse_pos)
             self.internal_canvas = None
             self.mouse_down = False
+            canvas.save_surface_to_screen()
 
     def draw(self, canvas: pygame.event.Event, mouse_pos: tuple) -> None:
         pygame.draw.circle(
@@ -304,7 +324,7 @@ class EllipseTool(Tool):
             self.point1 = mouse_pos
             radius = 0
             pygame.draw.ellipse(
-                canvas,
+                canvas.get_surface_for_drawing(),
                 (0, 0, 0),
                 pygame.Rect(self.point1[0], self.point1[1], 0, 0),
                 self.brush_size,
@@ -317,7 +337,7 @@ class EllipseTool(Tool):
             distance_x = distance_x if distance_x > 0 else -distance_x
             distance_y = distance_y if distance_y > 0 else -distance_y
             pygame.draw.ellipse(
-                canvas,
+                canvas.get_surface_for_drawing(),
                 (0, 0, 0),
                 pygame.Rect(
                     self.point1[0] - 0.5 * distance_x,
@@ -336,7 +356,7 @@ class EllipseTool(Tool):
             distance_x = distance_x if distance_x > 0 else -distance_x
             distance_y = distance_y if distance_y > 0 else -distance_y
             pygame.draw.ellipse(
-                canvas,
+                canvas.get_surface_for_drawing(),
                 (0, 0, 0),
                 pygame.Rect(
                     self.point1[0] - 0.5 * distance_x,
@@ -346,6 +366,7 @@ class EllipseTool(Tool):
                 ),
                 self.brush_size,
             )
+            canvas.save_surface_to_screen()
 
 
 class SplineTool(Tool):
