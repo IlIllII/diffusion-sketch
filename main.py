@@ -96,6 +96,11 @@ if __name__ == "__main__":
                     tool_index = (tool_index + 1) % len(tools)
                     active_tool = tool_list[tool_index]
                     active_tool.activate()
+                
+                if event.key == pygame.K_UP:
+                    active_tool.increase_brush_size()
+                if event.key == pygame.K_DOWN:
+                    active_tool.decrease_brush_size()
 
             pygame.display.flip()
 

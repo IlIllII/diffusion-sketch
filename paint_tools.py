@@ -5,6 +5,14 @@ from canvas import Canvas
 class Tool:
     def __init__(self) -> None:
         self.brush_size = 3
+    
+    def increase_brush_size(self) -> None:
+        self.brush_size += 1
+    
+    def decrease_brush_size(self) -> None:
+        self.brush_size -= 1
+        if self.brush_size < 1:
+            self.brush_size = 1
 
     def activate(self) -> None:
         pass
