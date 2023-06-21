@@ -13,7 +13,6 @@ from paint_tools import (
 from canvas import Canvas
 
 
-active_tool = SplineTool()
 
 tools = {
     pygame.K_1: PenTool(),
@@ -25,6 +24,20 @@ tools = {
     pygame.K_7: SplineTool(),
     pygame.K_8: PolylineTool(),
 }
+
+tool_list = [
+    PenTool(),
+    LineTool(),
+    RectTool(),
+    CircleTool(),
+    EraserTool(),
+    EllipseTool(),
+    SplineTool(),
+    PolylineTool(),
+]
+
+tool_index = 0
+active_tool = tool_list[tool_index]
 
 
 if __name__ == "__main__":
@@ -74,6 +87,15 @@ if __name__ == "__main__":
 
                 if event.key == pygame.K_u:
                     canvas.undo()
+                
+                if event.key == pygame.K_LEFT:
+                    tool_index = (tool_index - 1) % len(tools)
+                    active_tool = tool_list[tool_index]
+                    active_tool.activate()
+                if event.key == pygame.K_RIGHT:
+                    tool_index = (tool_index + 1) % len(tools)
+                    active_tool = tool_list[tool_index]
+                    active_tool.activate()
 
             pygame.display.flip()
 
