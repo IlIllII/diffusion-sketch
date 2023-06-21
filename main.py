@@ -8,6 +8,7 @@ from paint_tools import (
     EraserTool,
     EllipseTool,
     SplineTool,
+    PolylineTool,
     Canvas,
 )
 
@@ -22,23 +23,23 @@ tools = {
     pygame.K_5: EraserTool(),
     pygame.K_6: EllipseTool(),
     pygame.K_7: SplineTool(),
+    pygame.K_8: PolylineTool(),
 }
 
 
 if __name__ == "__main__":
+    SCREEN_WIDTH = 512
+    SCREEN_HEIGHT = 512
     pygame.init()
     pygame.display.set_caption("Diffusion Sketch!")
 
     # TODO: remove screen completely and wrap it in the canvas class
-    screen = pygame.display.set_mode((512, 512))
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     screen.fill((255, 255, 255))
 
     canvas = Canvas(screen)
     active_tool.activate()
     pygame.display.flip()
-
-    button_down = False
-    actively_drawing = False
 
     running = True
     while running:
@@ -50,7 +51,7 @@ if __name__ == "__main__":
             canvas.blit()
 
             if event.type == pygame.KEYDOWN:
-                if event.key in tools and not actively_drawing:
+                if event.key in tools:  # Crashes if actively drawing, probably
                     active_tool.deactivate()
                     active_tool = tools[event.key]
                     active_tool.activate()
