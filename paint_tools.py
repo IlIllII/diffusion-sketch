@@ -464,12 +464,10 @@ class SplineTool(Tool):
                 B2 = (1 / 6) * (-3 * t**3 + 3 * t**2 + 3 * t + 1)
                 B3 = (1 / 6) * (t**3)
                 bernstein_basis = [B0, B1, B2, B3]
-                print(control_points)
                 vertex = [
                     dot4D(bernstein_basis, control_point)
                     for control_point in zip(*control_points)
                 ]
-                print(vertex)
                 vertices.append(vertex)
         return vertices
 

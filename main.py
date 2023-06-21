@@ -9,8 +9,8 @@ from paint_tools import (
     EllipseTool,
     SplineTool,
     PolylineTool,
-    Canvas,
 )
+from canvas import Canvas
 
 
 active_tool = SplineTool()
