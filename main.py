@@ -13,7 +13,6 @@ from paint_tools import (
 from canvas import Canvas
 
 
-
 tools = {
     pygame.K_1: PenTool(),
     pygame.K_2: LineTool(),
@@ -62,7 +61,10 @@ if __name__ == "__main__":
 
             active_tool.handle_event(event, canvas)
             canvas.blit()
+            # TODO: Somehow blit ui to canvas; should it be contianed in canvas completely or should canvas return its screen and then we blit to it?
 
+            h_is_pressed = pygame.key.get_pressed()[pygame.K_h]
+            canvas.blit_ui(h_is_pressed, active_tool.brush_size, active_tool.__class__.__name__)
             if event.type == pygame.KEYDOWN:
                 if event.key in tools:  # Crashes if actively drawing, probably
                     active_tool.deactivate()
@@ -87,7 +89,7 @@ if __name__ == "__main__":
 
                 if event.key == pygame.K_u:
                     canvas.undo()
-                
+
                 if event.key == pygame.K_LEFT:
                     tool_index = (tool_index - 1) % len(tools)
                     active_tool = tool_list[tool_index]
@@ -96,7 +98,7 @@ if __name__ == "__main__":
                     tool_index = (tool_index + 1) % len(tools)
                     active_tool = tool_list[tool_index]
                     active_tool.activate()
-                
+
                 if event.key == pygame.K_UP:
                     active_tool.increase_brush_size()
                 if event.key == pygame.K_DOWN:

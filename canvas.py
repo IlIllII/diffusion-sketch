@@ -1,4 +1,5 @@
 import pygame
+from ui import UI
 
 
 class Canvas:
@@ -51,10 +52,8 @@ class Canvas:
             (mouse_pos[0] - 10, mouse_pos[1]),
             3,
         )
-        pygame.draw.rect(ui_canvas, (0, 0, 0), (10, 10, 120, 40), 1)
-        font = pygame.font.SysFont("Arial", 20)
-        text = font.render("Brush Size: 6", True, (0, 0, 0))
-        ui_canvas.blit(text, (20, 15))
+
+
         self.final_screen.blit(ui_canvas, (0, 0))
 
     def reset(self):
@@ -70,3 +69,8 @@ class Canvas:
     def get_ui(self):
         self.ui.blit(self.screen, (0, 0))
         return self.ui
+    
+    def blit_ui(self, display_help, brush_size, current_tool):
+        ui = UI()
+        self.ui = ui.get_ui(self.final_screen, brush_size, current_tool, display_help)
+        self.final_screen.blit(self.ui, (0, 0))
