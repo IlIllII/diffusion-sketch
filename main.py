@@ -16,8 +16,9 @@ def make_network_request():
         generate_image()
         result = "Network request complete!"
         result_queue.put(result)
-    except:
+    except Exception as e:
         result = "Network request failed!"
+        print(e)
         result_queue.put(result)
 
 

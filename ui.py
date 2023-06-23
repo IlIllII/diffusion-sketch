@@ -66,5 +66,13 @@ class UI:
             self.draw_elements(
                 (20, 15), self.drawing_elements(brush_size, current_tool)
             )
+        
+        
+        try:
+            im = pygame.image.load("output.png").convert_alpha()
+            im.set_alpha(128)
+            self.ui.blit(im, (0, 0))
+        except Exception as e:
+            print(e)
 
         return self.ui
