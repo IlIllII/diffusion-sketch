@@ -1,9 +1,28 @@
+import queue
+import threading
+
 import pygame
 
 from canvas import Canvas
 from paint_tools import (CircleTool, EllipseTool, EraserTool, LineTool,
                          PenTool, PolylineTool, RectTool, SplineTool)
 from render import generate_image, render_image
+
+
+result_queue = queue.Queue()
+
+def make_network_request():
+    try:
+        generate_image()
+        result = "Network request complete!"
+        result_queue.put(result)
+    except:
+        result = "Network request failed!"
+        result_queue.put(result)
+
+
+threading.Thread(target=make_network_request).start()
+
 
 tools = {
     pygame.K_1: PenTool(),
@@ -29,26 +48,6 @@ tool_list = [
 
 tool_index = 0
 active_tool = tool_list[tool_index]
-
-
-import threading
-import time  # simulate network delay
-import queue
-
-# Create a queue to hold the result
-result_queue = queue.Queue()
-
-def make_network_request():
-    try:
-        generate_image()
-        result = "Network request complete!"
-        result_queue.put(result)
-    except:
-        result = "Network request failed!"
-        result_queue.put(result)
-
-# Create and start a new thread
-threading.Thread(target=make_network_request).start()
 
 
 if __name__ == "__main__":
