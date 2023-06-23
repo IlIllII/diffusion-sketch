@@ -1,4 +1,5 @@
 import pygame
+
 from ui import UI
 
 
@@ -35,25 +36,6 @@ class Canvas:
         else:
             self.screen.blit(self.screen, (0, 0))
 
-        # TODO: extract ui drawing code
-        ui_canvas = self.get_ui()
-        mouse_pos = pygame.mouse.get_pos()
-        pygame.draw.line(
-            ui_canvas,
-            (0, 0, 0),
-            (mouse_pos[0], mouse_pos[1] + 10),
-            (mouse_pos[0], mouse_pos[1] - 10),
-            3,
-        )
-        pygame.draw.line(
-            ui_canvas,
-            (0, 0, 0),
-            (mouse_pos[0] + 10, mouse_pos[1]),
-            (mouse_pos[0] - 10, mouse_pos[1]),
-            3,
-        )
-
-        self.final_screen.blit(ui_canvas, (0, 0))
         self.blit_ui(display_help, brush_size, current_tool)
 
     def reset(self):
@@ -66,11 +48,9 @@ class Canvas:
         if len(self.undo_stack) > 0:
             self.screen.blit(self.undo_stack.pop(), (0, 0))
 
-    def get_ui(self):
-        self.ui.blit(self.screen, (0, 0))
-        return self.ui
-    
     def blit_ui(self, display_help, brush_size, current_tool):
+        # TODO: can cache UI
         ui = UI()
+        self.final_screen.blit(self.screen, (0, 0))
         self.ui = ui.get_ui(self.final_screen, brush_size, current_tool, display_help)
         self.final_screen.blit(self.ui, (0, 0))

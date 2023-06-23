@@ -1,17 +1,9 @@
 import pygame
-from render import render_image, generate_image
-from paint_tools import (
-    PenTool,
-    LineTool,
-    RectTool,
-    CircleTool,
-    EraserTool,
-    EllipseTool,
-    SplineTool,
-    PolylineTool,
-)
-from canvas import Canvas
 
+from canvas import Canvas
+from paint_tools import (CircleTool, EllipseTool, EraserTool, LineTool,
+                         PenTool, PolylineTool, RectTool, SplineTool)
+from render import generate_image, render_image
 
 tools = {
     pygame.K_1: PenTool(),
@@ -63,7 +55,9 @@ if __name__ == "__main__":
 
             # TODO: Should we bury this in the canvas class?
             h_is_pressed = pygame.key.get_pressed()[pygame.K_h]
-            canvas.blit(active_tool.brush_size, active_tool.__class__.__name__, h_is_pressed)
+            canvas.blit(
+                active_tool.brush_size, active_tool.__class__.__name__, h_is_pressed
+            )
 
             if event.type == pygame.KEYDOWN:
                 if event.key in tools:  # Crashes if actively drawing, probably
