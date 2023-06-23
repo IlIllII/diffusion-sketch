@@ -31,6 +31,26 @@ tool_index = 0
 active_tool = tool_list[tool_index]
 
 
+import threading
+import time  # simulate network delay
+import queue
+
+# Create a queue to hold the result
+result_queue = queue.Queue()
+
+def make_network_request():
+    try:
+        generate_image()
+        result = "Network request complete!"
+        result_queue.put(result)
+    except:
+        result = "Network request failed!"
+        result_queue.put(result)
+
+# Create and start a new thread
+threading.Thread(target=make_network_request).start()
+
+
 if __name__ == "__main__":
     SCREEN_WIDTH = 512
     SCREEN_HEIGHT = 512
@@ -47,6 +67,10 @@ if __name__ == "__main__":
 
     running = True
     while running:
+        if not result_queue.empty():
+            result = result_queue.get()
+            print(result)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -71,9 +95,9 @@ if __name__ == "__main__":
                 if event.key == pygame.K_ESCAPE:
                     running = False
                 if event.key == pygame.K_s:
-                    pygame.image.save(screen, "screenshot.png")
+                    pygame.image.save(canvas.screen, "screenshot.png")
                     print("Screenshot saved!")
-                    generate_image()
+                    threading.Thread(target=make_network_request).start()
 
                 if event.key == pygame.K_c:
                     canvas.reset()
