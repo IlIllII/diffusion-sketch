@@ -149,20 +149,28 @@ def generate_image():
         weight=1,
     )
 
-    # unit1 = webuiapi.ControlNetUnit(input_image=img, module='canny', model='controlnet11Models_canny [b18e0966]')
+    unit1 = webuiapi.ControlNetUnit(input_image=img, module='canny', model='controlnet11Models_canny [b18e0966]')
 
-    
-    
-    r = api.img2img(
-        images=[img],
-        prompt="airplane flying through the clouds, photorealistic, 8k, absurdres",
+    # r = api.img2img(
+    #     images=[img],
+    #     prompt="beautiful house, awesome scenery, colorful art",
+    #     negative_prompt="bad art",
+    #     controlnet_units=[scribble_unit],
+    #     sampler_name="Euler a",
+    #     cfg_scale=10,
+    #     steps=40
+    # )
+    # r.images[0].save("output.png")
+
+    r2 = api.txt2img(
+        prompt="beautiful house, awesome scenery, colorful art",
         negative_prompt="bad art",
         controlnet_units=[scribble_unit],
-        sampler_name="DPM++ 2M Karras",
-        cfg_scale=7,
+        sampler_name="Euler a",
+        cfg_scale=10,
         steps=40
     )
-    r.images[0].save("output.png")
+    r2.images[0].save("output.png")
     # r.image.show()
     # r.images[1].show()
 
