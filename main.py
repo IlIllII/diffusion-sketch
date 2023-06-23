@@ -4,12 +4,21 @@ import threading
 import pygame
 
 from canvas import Canvas
-from paint_tools import (CircleTool, EllipseTool, EraserTool, LineTool,
-                         PenTool, PolylineTool, RectTool, SplineTool)
+from paint_tools import (
+    CircleTool,
+    EllipseTool,
+    EraserTool,
+    LineTool,
+    PenTool,
+    PolylineTool,
+    RectTool,
+    SplineTool,
+)
 from render import generate_image, render_image
 
 
 result_queue = queue.Queue()
+
 
 def make_network_request():
     try:
@@ -50,6 +59,8 @@ tool_list = [
 tool_index = 0
 active_tool = tool_list[tool_index]
 
+render_mode = 0
+
 
 if __name__ == "__main__":
     SCREEN_WIDTH = 512
@@ -80,10 +91,17 @@ if __name__ == "__main__":
             # TODO: Should we bury this in the canvas class?
             h_is_pressed = pygame.key.get_pressed()[pygame.K_h]
             canvas.blit(
-                active_tool.brush_size, active_tool.__class__.__name__, h_is_pressed
+                active_tool.brush_size,
+                active_tool.__class__.__name__,
+                h_is_pressed,
+                render_mode,
             )
 
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_t:
+                    render_mode = (render_mode + 1) % 3
+                    print(f"Render mode changed to {render_mode}")
+
                 if event.key in tools:  # Crashes if actively drawing, probably
                     active_tool.deactivate()
                     active_tool = tools[event.key]

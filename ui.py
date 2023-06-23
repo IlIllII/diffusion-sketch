@@ -34,7 +34,7 @@ class UI:
             self.ui.blit(element, pos)
             pos = (pos[0], pos[1] + 30)
 
-    def get_ui(self, screen, brush_size, current_tool, display_help):
+    def get_ui(self, screen, brush_size, current_tool, display_help, render_mode):
         if not self.ui:
             self.ui = screen.copy()
         self.ui.blit(screen, (0, 0))
@@ -67,10 +67,11 @@ class UI:
                 (20, 15), self.drawing_elements(brush_size, current_tool)
             )
         
-        
+
         try:
             im = pygame.image.load("output.png").convert_alpha()
-            im.set_alpha(128)
+            alpha = 0 if render_mode == 0 else 128 if render_mode == 1 else 255
+            im.set_alpha(alpha)
             self.ui.blit(im, (0, 0))
         except Exception as e:
             print(e)

@@ -30,13 +30,13 @@ class Canvas:
         self.screen.blit(self.temp_canvas, (0, 0))
         self.undo_stack.append(self.screen_copy.copy())
 
-    def blit(self, brush_size, current_tool, display_help):
+    def blit(self, brush_size, current_tool, display_help, render_mode):
         if self.actively_drawing:
             self.screen.blit(self.temp_canvas, (0, 0))
         else:
             self.screen.blit(self.screen, (0, 0))
 
-        self.blit_ui(display_help, brush_size, current_tool)
+        self.blit_ui(display_help, brush_size, current_tool, render_mode)
 
     def reset(self):
         self.screen.fill((255, 255, 255))
@@ -48,9 +48,11 @@ class Canvas:
         if len(self.undo_stack) > 0:
             self.screen.blit(self.undo_stack.pop(), (0, 0))
 
-    def blit_ui(self, display_help, brush_size, current_tool):
+    def blit_ui(self, display_help, brush_size, current_tool, render_mode):
         # TODO: can cache UI
         ui = UI()
         self.final_screen.blit(self.screen, (0, 0))
-        self.ui = ui.get_ui(self.final_screen, brush_size, current_tool, display_help)
+        self.ui = ui.get_ui(
+            self.final_screen, brush_size, current_tool, display_help, render_mode
+        )
         self.final_screen.blit(self.ui, (0, 0))
