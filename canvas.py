@@ -29,7 +29,7 @@ class Canvas:
         self.screen.blit(self.temp_canvas, (0, 0))
         self.undo_stack.append(self.screen_copy.copy())
 
-    def blit(self):
+    def blit(self, brush_size, current_tool, display_help):
         if self.actively_drawing:
             self.screen.blit(self.temp_canvas, (0, 0))
         else:
@@ -53,8 +53,8 @@ class Canvas:
             3,
         )
 
-
         self.final_screen.blit(ui_canvas, (0, 0))
+        self.blit_ui(display_help, brush_size, current_tool)
 
     def reset(self):
         self.screen.fill((255, 255, 255))

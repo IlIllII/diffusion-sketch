@@ -60,11 +60,11 @@ if __name__ == "__main__":
                 running = False
 
             active_tool.handle_event(event, canvas)
-            canvas.blit()
-            # TODO: Somehow blit ui to canvas; should it be contianed in canvas completely or should canvas return its screen and then we blit to it?
 
+            # TODO: Should we bury this in the canvas class?
             h_is_pressed = pygame.key.get_pressed()[pygame.K_h]
-            canvas.blit_ui(h_is_pressed, active_tool.brush_size, active_tool.__class__.__name__)
+            canvas.blit(active_tool.brush_size, active_tool.__class__.__name__, h_is_pressed)
+
             if event.type == pygame.KEYDOWN:
                 if event.key in tools:  # Crashes if actively drawing, probably
                     active_tool.deactivate()
