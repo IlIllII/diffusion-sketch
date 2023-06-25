@@ -21,14 +21,22 @@ result_queue = queue.Queue()
 
 
 def make_network_request():
-    try:
-        generate_image()
-        result = "Network request complete!"
-        result_queue.put(result)
-    except Exception as e:
-        result = "Network request failed!"
-        print(e)
-        result_queue.put(result)
+    counter = 0
+    while counter < 10:
+        success = True
+        try:
+            generate_image()
+            result = "Network request complete!"
+            result_queue.put(result)
+        except Exception as e:
+            success = False
+            result = "Network request failed!"
+            print(e)
+            result_queue.put(result)
+        
+        if success:
+            break
+        counter += 1
 
 
 threading.Thread(target=make_network_request).start()
