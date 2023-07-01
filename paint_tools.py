@@ -2,18 +2,23 @@ import pygame
 
 from canvas import Canvas
 
+_brush_size = 3
 
 class Tool:
+    brush_size = 3
+
     def __init__(self) -> None:
-        self.brush_size = 3
+        pass
 
-    def increase_brush_size(self) -> None:
-        self.brush_size += 1
+    @classmethod
+    def increase_brush_size(cls) -> None:
+        Tool.brush_size += 1
 
-    def decrease_brush_size(self) -> None:
-        self.brush_size -= 1
-        if self.brush_size < 1:
-            self.brush_size = 1
+    @classmethod
+    def decrease_brush_size(cls) -> None:
+        Tool.brush_size -= 1
+        if Tool.brush_size < 1:
+            Tool.brush_size = 1
 
     def activate(self) -> None:
         pass
