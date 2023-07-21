@@ -1,6 +1,3 @@
-import queue
-import threading
-
 import pygame
 
 from canvas import Canvas
@@ -14,32 +11,7 @@ from paint_tools import (
     RectTool,
     SplineTool,
 )
-from render import generate_image, render_image
-
-
-result_queue = queue.Queue()
-
-
-def make_network_request():
-    counter = 0
-    while counter < 10:
-        success = True
-        try:
-            generate_image()
-            result = "Network request complete!"
-            result_queue.put(result)
-        except Exception as e:
-            success = False
-            result = "Network request failed!"
-            print(e)
-            result_queue.put(result)
-        
-        if success:
-            break
-        counter += 1
-
-
-threading.Thread(target=make_network_request).start()
+from render import *
 
 
 tools = {
@@ -123,13 +95,10 @@ if __name__ == "__main__":
                 if event.key == pygame.K_s:
                     pygame.image.save(canvas.screen, "screenshot.png")
                     print("Screenshot saved!")
-                    threading.Thread(target=make_network_request).start()
+                    send_screenshot_to_sd()
 
                 if event.key == pygame.K_c:
                     canvas.reset()
-
-                if event.key == pygame.K_t:
-                    pygame.draw.circle(screen, (0, 0, 0), pygame.mouse.get_pos(), 10)
 
                 if event.key == pygame.K_u:
                     canvas.undo()
