@@ -50,6 +50,7 @@ def make_network_request():
 def send_screenshot_to_sd():
     threading.Thread(target=make_network_request).start()
 
+
 def check_for_result():
     if not result_queue.empty():
         result = result_queue.get()

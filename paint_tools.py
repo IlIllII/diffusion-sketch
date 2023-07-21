@@ -4,6 +4,7 @@ from canvas import Canvas
 
 _brush_size = 3
 
+
 class Tool:
     brush_size = 3
 
