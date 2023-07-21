@@ -1,12 +1,9 @@
-import requests
-from PIL import Image
-from io import BytesIO
-import base64
+import queue
+import threading
+
 import webuiapi
+from PIL import Image
 
-# import json
-
-server = "http://127.0.0.1:7860/sdapi/v1/txt2img"
 
 def generate_image():
     api = webuiapi.WebUIApi()
@@ -17,21 +14,7 @@ def generate_image():
         model="controlnet11Models_scribble [4e6af23e]",
         weight=1,
     )
-
-    unit1 = webuiapi.ControlNetUnit(input_image=img, module='canny', model='controlnet11Models_canny [b18e0966]')
-
-    # r = api.img2img(
-    #     images=[img],
-    #     prompt="beautiful house, awesome scenery, colorful art",
-    #     negative_prompt="bad art",
-    #     controlnet_units=[scribble_unit],
-    #     sampler_name="Euler a",
-    #     cfg_scale=10,
-    #     steps=40
-    # )
-    # r.images[0].save("output.png")
-
-    r2 = api.txt2img(
+    result = api.txt2img(
         prompt="beautiful house, awesome scenery, colorful art",
         negative_prompt="bad art",
         controlnet_units=[scribble_unit],
@@ -39,10 +22,8 @@ def generate_image():
         cfg_scale=10,
         steps=40,
     )
-    r2.images[0].save("output.png")
+    result.images[0].save("output.png")
 
-import queue
-import threading
 
 result_queue = queue.Queue()
 
@@ -60,10 +41,16 @@ def make_network_request():
             result = "Network request failed!"
             print(e)
             result_queue.put(result)
-        
+
         if success:
             break
         counter += 1
 
+
 def send_screenshot_to_sd():
     threading.Thread(target=make_network_request).start()
+
+def check_for_result():
+    if not result_queue.empty():
+        result = result_queue.get()
+        print(result)
